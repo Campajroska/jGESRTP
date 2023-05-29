@@ -1,18 +1,18 @@
 # jGESRTP
 
-**jGESRTP** è una libreria Open Source che permette la comunicazione tra client e PLC General Elettric o Emerson.
+**jGESRTP** it is an open-source library that enables communication between clients and General Electric or Emerson PLCs.
 
-GE utilizza il protocollo SRTP (Secure Real-time Transport Protocol) adattato alle esigenze dei PLC creando un protocollo proprietario e disponibile solo per VB, C++ e C#.
+GE utilizes the Secure Real-time Transport Protocol (SRTP) adapted to the needs of PLCs, creating a proprietary protocol that is available only for VB, C++, and C#.
 
-Per questioni lavorative ho la necessità di riuscire ad implementare questa libreria per creare software SCADA per il monitoraggio di impianti industriali in Java e per questo motivo ho decido di creare questa liberia che è ancora in fase di sviluppo e che può essere implementata dalla community.
+For work-related reasons, I have the need to be able to implement this library to create SCADA software for monitoring industrial plants in Java. That's why I have decided to create this library, which is still in the development phase and can be implemented by the community.
 
-## Creazione e Test
+## Creation and Testing
 
-Per creare la libreria ho utilizzato una documentazione [PDF]([(PDF) Leveraging the SRTP protocol for over-the-network memory acquisition of a GE Fanuc Series 90-30](https://www.researchgate.net/publication/318925679_Leveraging_the_SRTP_protocol_for_over-the-network_memory_acquisition_of_a_GE_Fanuc_Series_90-30)) trovata in rete che spiega a grandi linee la struttura dei dati da passare per instaurare la connessione e per lo scambio di dati.
+To create the library, I used documentation. [PDF]([(PDF) Leveraging the SRTP protocol for over-the-network memory acquisition of a GE Fanuc Series 90-30](https://www.researchgate.net/publication/318925679_Leveraging_the_SRTP_protocol_for_over-the-network_memory_acquisition_of_a_GE_Fanuc_Series_90-30)) I found online documentation that explains the basic structure of the data to be passed for establishing the connection and for data exchange.
 
-Successivamente ho trovato un programma in VB6 che mi consentiva di scrivere e leggere molteplici memorie contemporaneamente e grazie all'utilizzo di WireShark sono risalito alla struttura dei dati completa.
+Later, I found a VB6 program that allowed me to write and read multiple memories simultaneously, and using WireShark, I was able to determine the complete data structure.
 
-Questa libreria è stata testata su PLC:
+This library has been tested on PLCs:
 
 - GE 90-30
 
@@ -22,19 +22,19 @@ Questa libreria è stata testata su PLC:
 
 - Emerson RSTi
 
-## Struttura dati
+## Data structure
 
-In generale possiamo dire che la comunicazione avviene passando 56 byte dove solo alcuni sono rilevanti.
+In general, we can say that communication occurs by passing 56 bytes where only some are relevant.
 
-#### Connessione
+#### Connesction
 
-Per prima cosa bisogna creare una matrice di 56 byte tutti 0x00 che sara il messaggio da inviare al PLC.
+First, we need to create a 56-byte matrix filled with **0x00**, which will be the message to be sent to the PLC.
 
 ```java
 private static byte[] msg_init = new byte[56];
 ```
 
-Attraverso la funzione **initConnection** e passando una stringa contente l'indirizzo ip del PLC potremo instaurare la connessione sulla porta 18245 impostata di default.
+Through the **initConnection** function, by passing a string containing the IP address of the PLC, we can establish the connection on the default port 18245.
 
 ```java
 public static int initConnection(String ip){
@@ -66,11 +66,11 @@ public static int initConnection(String ip){
     }
 ```
 
-Una volta effettuata la connessione attraverso il Socket dobbiamo inviare la matriche creata in precedenza e la risposta del PLC deve essere **0x01** per avere la conferma che può iniziare lo scambio di dati.
+Once the connection is established through the socket, we need to send the previously created matrix, and the response from the PLC should be **0x01** to confirm that data exchange can begin.
 
-#### Abilitazione SCADA
+#### Enable SCADA
 
-Per abilitare il monitoraggio SCADA e di conseguenza la simultaneità di più client che leggono/scrivono i dati bisogna usare questa struttura dati:
+To enable SCADA monitoring and, consequently, the simultaneous access of multiple clients for reading/writing data, you need to use this data structure:
 
 ```java
 private static byte[] msg_scada = { 
@@ -134,7 +134,7 @@ private static byte[] msg_scada = {
         };
 ```
 
-Con la funzione **initScada** possiamo abilitare la connessione SCADA con il PLC:
+With the **initScada** function, we can enable the SCADA connection with the PLC.
 
 ```java
 public static int initScada(){
@@ -161,11 +161,11 @@ public static int initScada(){
     }
 ```
 
-L'abilitazione avviene solo se il PLC risponde nel primo byte con **0x03**
+The enablement only occurs if the PLC responds with **x03** in the first byte.
 
-#### Disconnessione
+#### Disconnect
 
-Per quanto riguarda la disconnessione è molto simile al processo di connessione, bisogna inviare tramite socket l'array **msg_init** e chiudere il socket.
+As for the disconnection, it is very similar to the connection process. You need to send the **msg_init** array via the socket and then close the socket.
 
 ```java
 public static int closeConnection(){
@@ -189,9 +189,9 @@ public static int closeConnection(){
     }
 ```
 
-#### Lettura
+#### Reading
 
-Questa è la struttura base dei dati per la lettura di memorie.
+This is the basic data structure for reading memories.
 
 ```java
 private static byte[] msg_read = {
@@ -254,7 +254,7 @@ private static byte[] msg_read = {
         };
 ```
 
-Questa è la funzione di esempio che in questo caso va a leggere le memorie %R ma il ragionamento vale per ogni tipo di memoria che vogliamo leggere.
+This is an example function that, in this case, reads %R memories, but the logic applies to any type of memory we want to read.
 
 ```java
 public static int[] read_R_WORD(int address, int number){   
@@ -309,33 +309,31 @@ public static int[] read_R_WORD(int address, int number){
     }
 ```
 
-Dati da inserire:
+Data to be inserted:
 
-- **msg_send[3]**: indice che si incrementa ad ogni invio di dati da parte del client.
+- **msg_send[30]**: An index that increments with each data transmission by the client.
 
-- **msg_send[30]**: indice che si incrementa ad ogni invio di dati da parte del client.
+- **msg_send[42]**: A byte that corresponds to the code for reading memories.
 
-- **msg_send[42]**: byte che corrisponde al codice per la lettura di memorie.
+- **msg_send[43]**: A byte that corresponds to the code for the memory type.
 
-- **msg_send[43]**: byte che corrisponde al codice per il tipo di memoria.
+- **msg_send[44]**: Start memory (LSB).
 
-- **msg_send[44]**: numero della memoria iniziale (LSB)
+- **msg_send[45]**: Start memory (MSB).
 
-- **msg_send[45]**: numero della memoria iniziale (MSB)
+- **msg_send[46]**: Number of memory (LSB).
 
-- **msg_send[46]**: numero di memorie da leggere (LSB)
+- **msg_send[47]**: Number of memory (MSB).
 
-- **msg_send[47]**: numero di memorie da leggere  (MSB)
+Once the packet with all the data is sent, the PLC will send two responses: the first one is just a confirmation (if the first byte is 0x03, it means the request was successful), and the second one actually contains the data of interest.
 
-Una volta inviato il pacchetto con tutti i dati il PLC invierà due risposte: la prima è solo di conferma (se il primo byte è **0x03** vuol dire che la richiesta è andata a buon fine) e la seconda che contiene effettivamente i dati che ci interessano.
+###### Important
 
-###### Nota bene
+If the number of memories to be read is less than or equal to 3, the PLC will only send one response, and the requested data can be found starting from byte number 44.
 
-Se il numero di memorie da leggere è minore o uguale a 3 allora il PLC invierà solo una risposta e i dati che abbiamo richiesto li troveremo a partire dal byte numero 44.
+#### Writing
 
-#### Scrittura
-
-Questa è la struttura dati per la scrittura di memorie.
+This is the basic data structure for writing memories.
 
 ```java
 private static byte[] msg_write = {
@@ -398,7 +396,7 @@ private static byte[] msg_write = {
         };
 ```
 
-Questa è la funzione di esempio che in questo caso va a scrivere le memorie %R ma il ragionamento vale per ogni tipo di memoria che vogliamo scrivere.
+This is an example function that, in this case, writes to %R memories, but the logic applies to any type of memory we want to write to.
 
 ```java
 public static boolean write_R_WORD(int address, int[] valori){
@@ -451,35 +449,33 @@ public static boolean write_R_WORD(int address, int[] valori){
     }
 ```
 
-Dati da inserire:
+Data to be inserted:
 
-- **msg_send[3]**: indice che si incrementa ad ogni invio di dati da parte del client.
+- **msg_send[30]**: An index that increments with each data transmission by the client.
 
-- **msg_send[30]**: indice che si incrementa ad ogni invio di dati da parte del client.
+- **msg_send[4]**: Number of bytes to write (LSB)
 
-- **msg_send[4]**: numero di byte che vogliamo scrivere (LSB)
+- **msg_send[5]**: Number of bytes to write (MSB)
 
-- **msg_send[5]**: numero di byte che vogliamo scrivere (MSB)
+- **msg_send[50]**: A byte that corresponds to the code for writing memories.
 
-- **msg_send[50]**: byte che corrisponde al codice per la lettura di memorie.
+- **msg_send[51]**: A byte that corresponds to the code for the memory type.
 
-- **msg_send[51]**: byte che corrisponde al codice per il tipo di memoria.
+- **msg_send[52]**: Start memory (LSB)
 
-- **msg_send[52]**: numero della memoria iniziale (LSB)
+- **msg_send[53]**: Start memory (MSB)
 
-- **msg_send[53]**: numero della memoria iniziale (MSB)
+- **msg_send[54]**: Number of memory (LSB)
 
-- **msg_send[54]**: numero di memorie da leggere (LSB)
+- **msg_send[55]**: Number of memory (MSB)
 
-- **msg_send[55]**: numero di memorie da leggere (MSB)
-
-In questo caso dobbiamo inviare due pacchetti: il primo che è **msg_send** e il secondo è un array che deve avere le dimensioni specificate in precedenza e contiene i valori che effettivamente vogliamo scrivere, una volta inviati il PLC risponderà con **0x03** se tutto è andato a buon fine.
+In this case, we need to send two packets: the first one is **msg_send**, and the second one is an array that should have the specified dimensions and contains the values we actually want to write. Once sent, the PLC will respond with **0x03** if everything went well.
 
 #### Memory Type Code
 
-Questi sono tutti i byte che corrispondono al tipo di memoria che si vuole leggere o scrivere.
+These are all the bytes that correspond to the memory type you want to read or write.
 
-In questa libreria per il momento sono implementate solo le AI, AQ e R per motivi strettamente lavorativi ma in futuro ho l'obbiettivo di implementare tutti i tipi di memorie in modo da renderlo più completo possibile.
+In this library, for now, only **AI**, **AQ**, and **R** memories are implemented due to work-related reasons. However, in the future, my goal is to implement all types of memories to make it as comprehensive as possible.
 
 ```java
 class MEMORY_TYPE{
@@ -507,9 +503,9 @@ class MEMORY_TYPE{
 
 #### Service Request Code
 
-Questi sono tutti i tipi di richiesta che possono essere fatti al PLC, per il momento sono implementati solo **READ_SYS_MEMORY** e **WRITE_SYS_MEMORY**.
+These are all the types of requests that can be made to the PLC. Currently, only **READ_SYS_MEMORY** and **WRITE_SYS_MEMORY** are implemented.
 
-In futuro penso di implementare solo il **PLC_STATUS** perchè a livello di software SCADA non vedo la necessità di altri tipi di richieste.
+In the future, I plan to implement only the **PLC_STATUS** request because, at the SCADA software level, I don't see the need for other types of requests.
 
 ```java
 class SERVICE_REQUEST{
@@ -526,9 +522,9 @@ class SERVICE_REQUEST{
 }
 ```
 
-## Esempi
+## Examples
 
-Per chi non volesse modificare la libreria ma solo utilizzarla, ecco un esempio di lettura:
+For those who don't want to modify the library but only use it, here is an example of reading:
 
 ```java
 jGESRTP plc = new jGESRTP();
@@ -548,7 +544,7 @@ if(status_connection == 0){
 }
 ```
 
-E un esempio di scrittura:
+Here's an example of writing using the library:
 
 ```java
 jGESRTP plc = new jGESRTP();
@@ -569,18 +565,18 @@ if(status_connection == 0){
 }
 ```
 
-## Importante
+## Important
 
-Questa libreria è ancora in versione beta anche se è stata testata molte volte, consiglio di controllare su banco di prova che tutto funzioni correttamente prima di implementarla sel software di supervisione.
+This library is still in the beta version, even though it has been tested multiple times. I recommend performing thorough testing on a test bench to ensure that everything functions correctly before implementing it in the supervision software. It's always good practice to validate the library's performance and stability in a controlled environment before deploying it in a production system.
 
-Come già detto la libreria è Open Source quindi per chiunque volesse contribuire allo sviluppo può benissimo farlo e lo invito a condividere gli aggiornamenti in modo da aggiornare anche la versione ufficiale o anche solo comunicare eventuali bug in modo da risolverli.
+As mentioned earlier, the library is open source, so anyone who wants to contribute to its development is welcome to do so. I encourage you to share your updates and improvements so that the official version can be updated accordingly. Additionally, please feel free to report any bugs you encounter, as this will help in resolving them. Collaboration and community involvement are key to the success and improvement of open-source projects.
 
 ## TODO
 
-- [ ] Sviluppare la lettura e la scrittura per tutti i tipi di memoria.
+- [ ] Developing read and write capabilities for all types of memory.
 
-- [ ] Sviluppare tutti i tipi di request.
+- [ ] Developing all types of requests.
 
-- [ ] Verificare che effettivamente l'abilitazione SCADA permette in monitoraggio di più client.
+- [ ] Verifying that SCADA enablement indeed allows monitoring by multiple clients.
 
-- [ ] Sviluppare la lettura e la scrittura anche per DWORD e FLOAT
+- [ ] Developing read and write capabilities for DWORD and FLOAT data types as well.
