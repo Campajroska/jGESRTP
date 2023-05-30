@@ -8,7 +8,7 @@ For work-related reasons, I have the need to be able to implement this library t
 
 ## Creation and Testing
 
-To create the library, I used this documentation. [PDF]([(PDF) Leveraging the SRTP protocol for over-the-network memory acquisition of a GE Fanuc Series 90-30](https://www.researchgate.net/publication/318925679_Leveraging_the_SRTP_protocol_for_over-the-network_memory_acquisition_of_a_GE_Fanuc_Series_90-30)) I found online documentation that explains the basic structure of the data to be passed for establishing the connection and for data exchange.
+To create the library, I used this documentation. [PDF](https://www.researchgate.net/publication/318925679_Leveraging_the_SRTP_protocol_for_over-the-network_memory_acquisition_of_a_GE_Fanuc_Series_90-30) I found online documentation that explains the basic structure of the data to be passed for establishing the connection and for data exchange.
 
 Later, I found a VB6 program that allowed me to write and read multiple memories simultaneously, and using WireShark, I was able to determine the complete data structure.
 
