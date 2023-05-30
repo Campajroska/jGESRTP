@@ -197,7 +197,7 @@ This is the basic data structure for reading memories.
 private static byte[] msg_read = {
             0x02,        // 00
             0x00,        // 01
-            0x00,        // 02 - Seq Number
+            0x00,        // 02
             0x00,        // 03
             0x00,        // 04
             0x00,        // 05
@@ -327,7 +327,7 @@ Data to be inserted:
 
 Once the packet with all the data is sent, the PLC will send two responses: the first one is just a confirmation (if the first byte is 0x03, it means the request was successful), and the second one actually contains the data of interest.
 
-###### Important
+##### Important
 
 If the number of memories to be read is less than or equal to 3, the PLC will only send one response, and the requested data can be found starting from byte number 44.
 
@@ -339,7 +339,7 @@ This is the basic data structure for writing memories.
 private static byte[] msg_write = {
             0x02,        // 00
             0x00,        // 01
-            0x00,        // 02 - Seq Number
+            0x00,        // 02
             0x00,        // 03
             0x00,        // 04 - Number of bytes to write LSB
             0x00,        // 05 - Number of bytes to write MSB
