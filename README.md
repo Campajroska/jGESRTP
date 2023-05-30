@@ -26,7 +26,7 @@ This library has been tested on PLCs:
 
 In general, we can say that communication occurs by passing 56 bytes where only some are relevant.
 
-#### Connesction
+#### Connection
 
 First, we need to create a 56-byte matrix filled with **0x00**, which will be the message to be sent to the PLC.
 
